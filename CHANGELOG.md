@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-parking-hub` will be documented in this file.
 
+## v0.1.3 - 2025-05-20
+
+### What's Changed
+
+* feat: refactor buildFailure method to be static in ParkingValidationR… by @mirchaemanuel in https://github.com/Oltrematica/laravel-parking-hub/pull/2
+
+**Full Changelog**: https://github.com/Oltrematica/laravel-parking-hub/compare/v0.1.2...v0.1.3
+
 ## v0.1.2 - 2025-05-20
 
 ### What's Changed
