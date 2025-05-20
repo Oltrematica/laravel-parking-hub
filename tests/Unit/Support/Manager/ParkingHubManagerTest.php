@@ -48,7 +48,7 @@ describe('ParkingHubManager - createDriver', function (): void {
         $driverName = 'valid_driver';
         $driverClass = new class([]) implements ParkingValidator
         {
-            public function checkPlate(string $plateNumber, Carbon\CarbonInterface $verificationDateTime): Oltrematica\ParkingHub\DTOs\ParkingValidationResponseData {}
+            public function checkPlate(string $plateNumber, ?Carbon\CarbonInterface $verificationDateTime): Oltrematica\ParkingHub\DTOs\ParkingValidationResponseData {}
         };
         Config::set("parking-hub.drivers.{$driverName}", ['class' => $driverClass::class]);
 
@@ -130,7 +130,7 @@ if (! class_exists('TestConfigurableDriver')) {
     {
         public function __construct(private readonly array $config) {}
 
-        public function checkPlate(string $plateNumber, Carbon\CarbonInterface $verificationDateTime): Oltrematica\ParkingHub\DTOs\ParkingValidationResponseData
+        public function checkPlate(string $plateNumber, ?Carbon\CarbonInterface $verificationDateTime): Oltrematica\ParkingHub\DTOs\ParkingValidationResponseData
         {
             // Dummy implementation
             return new Oltrematica\ParkingHub\DTOs\ParkingValidationResponseData(
