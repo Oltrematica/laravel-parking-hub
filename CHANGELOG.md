@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-parking-hub` will be documented in this file.
 
+## v0.1.2 - 2025-05-20
+
+### What's Changed
+
+* Feat/improve provider interaction status by @mirchaemanuel in https://github.com/Oltrematica/laravel-parking-hub/pull/1
+
+**Full Changelog**: https://github.com/Oltrematica/laravel-parking-hub/compare/v0.1.1...v0.1.2
+
 ## v0.1.1 - 2025-05-20
 
 **Full Changelog**: https://github.com/Oltrematica/laravel-parking-hub/compare/v0.1.0...v0.1.1
