@@ -5,6 +5,9 @@
 
 # Laravel ParkingHub
 
+<img src="https://github.com/user-attachments/assets/3e57322c-204d-4fb2-a89e-02609fe67fa3" width="100" height="100" />
+
+
 `laravel-parking-hub` is a Laravel package designed to create a unified and consistent way to interact with different
 parking service APIs (e.g., Parkeon, My Cicero). It aims to standardize the input and output of parking validation
 requests, making it easier to integrate and manage multiple parking providers.
