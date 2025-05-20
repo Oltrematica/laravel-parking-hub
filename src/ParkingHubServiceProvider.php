@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Oltrematica\ParkingHub;
 
+use Illuminate\Container\Container;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
+use Oltrematica\ParkingHub\Support\Manager\ParkingHubManager;
 
 class ParkingHubServiceProvider extends LaravelServiceProvider
 {
     public function register(): void
     {
-
         $this->mergeConfigFrom(__DIR__.'/../config/parking-hub.php', 'parking-hub');
 
+        // Register the ParkingHubManager as a singleton
+        $this->app->singleton(ParkingHubManager::class, fn (Container $app): ParkingHubManager => new ParkingHubManager($app));
     }
 
     public function boot(): void
