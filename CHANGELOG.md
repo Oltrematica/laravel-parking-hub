@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-parking-hub` will be documented in this file.
 
+## v0.1.1 - 2025-05-20
+
+**Full Changelog**: https://github.com/Oltrematica/laravel-parking-hub/compare/v0.1.0...v0.1.1
+
 ## v0.1.0 - 2025-05-20
 
 This is the first public release of Laravel Parking Hub.
