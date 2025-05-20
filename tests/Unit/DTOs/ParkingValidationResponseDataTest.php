@@ -15,15 +15,7 @@ describe('ParkingValidationResponseData - buildFailure', function (): void {
         $plate = 'AA123BB';
         $requestTimestamp = Carbon::now();
 
-        expect(fn (): ParkingValidationResponseData => (new ParkingValidationResponseData(
-            responseStatus: ProviderInteractionStatus::SUCCESS_OK, // Dummy initial status, not used by buildFailure directly
-            plate: $plate,
-            requestTimestamp: $requestTimestamp,
-            verificationTimestamp: $requestTimestamp,
-            isValid: true,
-            parkingEndTime: null,
-            purchasedParkings: null
-        ))->buildFailure($successStatus, $plate, $requestTimestamp, null))
+        expect(fn (): ParkingValidationResponseData => ParkingValidationResponseData::buildFailure($successStatus, $plate, $requestTimestamp, null))
             ->toThrow(InvalidArgumentException::class, 'Interaction status is success, but the response indicates failure.');
     })->with([
         'SUCCESS_OK' => ProviderInteractionStatus::SUCCESS_OK,
@@ -35,15 +27,7 @@ describe('ParkingValidationResponseData - buildFailure', function (): void {
         $requestTimestamp = Carbon::parse('2023-01-01 10:00:00');
         $verificationTimestamp = Carbon::parse('2023-01-01 10:05:00');
 
-        $dto = (new ParkingValidationResponseData(
-            responseStatus: ProviderInteractionStatus::SUCCESS_OK, // Dummy initial status
-            plate: $plate,
-            requestTimestamp: $requestTimestamp,
-            verificationTimestamp: $requestTimestamp,
-            isValid: true,
-            parkingEndTime: null,
-            purchasedParkings: null
-        ))->buildFailure($errorStatus, $plate, $requestTimestamp, $verificationTimestamp);
+        $dto = ParkingValidationResponseData::buildFailure($errorStatus, $plate, $requestTimestamp, $verificationTimestamp);
 
         expect($dto)->toBeInstanceOf(ParkingValidationResponseData::class)
             ->and($dto->responseStatus)->toBe($errorStatus)
@@ -71,15 +55,7 @@ describe('ParkingValidationResponseData - buildFailure', function (): void {
         $requestTimestamp = Carbon::parse('2023-02-01 12:00:00');
         $errorStatus = ProviderInteractionStatus::ERROR_PROVIDER_UNAVAILABLE;
 
-        $dto = (new ParkingValidationResponseData(
-            responseStatus: ProviderInteractionStatus::SUCCESS_OK, // Dummy initial status
-            plate: $plate,
-            requestTimestamp: $requestTimestamp,
-            verificationTimestamp: $requestTimestamp,
-            isValid: true,
-            parkingEndTime: null,
-            purchasedParkings: null
-        ))->buildFailure($errorStatus, $plate, $requestTimestamp, null);
+        $dto = ParkingValidationResponseData::buildFailure($errorStatus, $plate, $requestTimestamp, null);
 
         expect($dto->verificationTimestamp)->toBeInstanceOf(CarbonInterface::class)
             ->and($dto->verificationTimestamp->equalTo($requestTimestamp))->toBeTrue();
