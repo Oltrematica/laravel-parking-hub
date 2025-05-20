@@ -229,11 +229,6 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details. If this file does not
 
 If you discover a security vulnerability within this package, please send an e-mail to [security@oltrematica.it](mailto:security@oltrematica.it). All security vulnerabilities will be promptly addressed. Alternatively, you can check the [security policy](https://github.com/Oltrematica/laravel-parking-hub/security/policy) on GitHub.
 
-## Credits
-
-- [Ryuujin](https://github.com/Oltrematica)
-- [All Contributors](https://github.com/Oltrematica/laravel-parking-hub/graphs/contributors)
-
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE) for more information.
