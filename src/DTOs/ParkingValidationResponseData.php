@@ -37,7 +37,7 @@ class ParkingValidationResponseData extends Data
      *
      * @return self DTO instance with success status
      */
-    public function buildFailure(ProviderInteractionStatus $interactionStatus, string $plate, CarbonInterface $requestTimestamp, ?CarbonInterface $verifcationTimestamp): self
+    public static function buildFailure(ProviderInteractionStatus $interactionStatus, string $plate, CarbonInterface $requestTimestamp, ?CarbonInterface $verifcationTimestamp): self
     {
         if ($interactionStatus->isSuccess()) {
             throw new InvalidArgumentException(
