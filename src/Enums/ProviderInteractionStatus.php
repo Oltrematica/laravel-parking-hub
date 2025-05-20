@@ -26,4 +26,24 @@ enum ProviderInteractionStatus: string
             self::ERROR_PROVIDER_UNKNOWN => __('oltrematica-parking-hub::parking-hub.provider-interaction-status.ERROR_PROVIDER_UNKNOWN'),
         };
     }
+
+    public function isSuccess(): bool
+    {
+        return match ($this) {
+            self::SUCCESS_OK, self::SUCCESS_PLATE_NOT_FOUND => true,
+            default => false,
+        };
+    }
+
+    public function isError(): bool
+    {
+        return match ($this) {
+            self::ERROR_PROVIDER_UNAVAILABLE,
+            self::ERROR_PROVIDER_AUTHENTICATION,
+            self::ERROR_INVALID_PLATE_FORMAT_FOR_PROVIDER,
+            self::ERROR_PROVIDER_BAD_REQUEST,
+            self::ERROR_PROVIDER_UNKNOWN => true,
+            default => false,
+        };
+    }
 }

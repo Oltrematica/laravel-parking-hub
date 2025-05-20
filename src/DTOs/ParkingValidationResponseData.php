@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oltrematica\ParkingHub\DTOs;
 
 use Carbon\CarbonInterface;
+use InvalidArgumentException;
 use Oltrematica\ParkingHub\Enums\ProviderInteractionStatus;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
@@ -30,4 +31,28 @@ class ParkingValidationResponseData extends Data
         #[DataCollectionOf(PurchasedParkingData::class)]
         public ?array $purchasedParkings,
     ) {}
+
+    /**
+     * @throw InvalidArgumentException if the interaction status is success
+     *
+     * @return self DTO instance with success status
+     */
+    public function buildFailure(ProviderInteractionStatus $interactionStatus, string $plate, CarbonInterface $requestTimestamp, ?CarbonInterface $verifcationTimestamp): self
+    {
+        if ($interactionStatus->isSuccess()) {
+            throw new InvalidArgumentException(
+                'Interaction status is success, but the response indicates failure.'
+            );
+        }
+
+        return new self(
+            responseStatus: $interactionStatus,
+            plate: $plate,
+            requestTimestamp: $requestTimestamp,
+            verificationTimestamp: $verifcationTimestamp ?? $requestTimestamp,
+            isValid: false,
+            parkingEndTime: null,
+            purchasedParkings: null
+        );
+    }
 }
