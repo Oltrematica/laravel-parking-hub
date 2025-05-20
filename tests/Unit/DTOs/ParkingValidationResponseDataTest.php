@@ -60,6 +60,9 @@ describe('ParkingValidationResponseData - buildFailure', function (): void {
         'ERROR_PROVIDER_AUTHENTICATION' => ProviderInteractionStatus::ERROR_PROVIDER_AUTHENTICATION,
         'ERROR_INVALID_PLATE_FORMAT_FOR_PROVIDER' => ProviderInteractionStatus::ERROR_INVALID_PLATE_FORMAT_FOR_PROVIDER,
         'ERROR_PROVIDER_BAD_REQUEST' => ProviderInteractionStatus::ERROR_PROVIDER_BAD_REQUEST,
+        'ERROR_PROVIDER_CONFIGURATION' => ProviderInteractionStatus::ERROR_PROVIDER_CONFIGURATION,
+        'ERROR_CONNECTION_TIMEOUT' => ProviderInteractionStatus::ERROR_CONNECTION_TIMEOUT,
+        'ERROR_INVALID_RESPONSE' => ProviderInteractionStatus::ERROR_INVALID_RESPONSE,
         'ERROR_PROVIDER_UNKNOWN' => ProviderInteractionStatus::ERROR_PROVIDER_UNKNOWN,
     ]);
 
