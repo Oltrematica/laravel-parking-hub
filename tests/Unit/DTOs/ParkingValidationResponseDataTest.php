@@ -15,7 +15,7 @@ describe('ParkingValidationResponseData - buildFailure', function (): void {
         $plate = 'AA123BB';
         $requestTimestamp = Carbon::now();
 
-        expect(fn () => (new ParkingValidationResponseData(
+        expect(fn (): ParkingValidationResponseData => (new ParkingValidationResponseData(
             responseStatus: ProviderInteractionStatus::SUCCESS_OK, // Dummy initial status, not used by buildFailure directly
             plate: $plate,
             requestTimestamp: $requestTimestamp,
@@ -82,4 +82,3 @@ describe('ParkingValidationResponseData - buildFailure', function (): void {
             ->and($dto->verificationTimestamp->equalTo($requestTimestamp))->toBeTrue();
     });
 });
-

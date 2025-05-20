@@ -25,4 +25,3 @@ describe('PurchasedParkingData', function (): void {
             ->and($dto->endDateTime->equalTo($endTime))->toBeTrue();
     });
 });
-
