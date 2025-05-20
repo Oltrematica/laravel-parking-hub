@@ -26,10 +26,10 @@ interface ParkingValidator
      * 4. Setting the 'requestTimestamp' in the DTO to the moment this check begins processing.
      *
      * @param  string  $plateNumber  the license plate number to check
-     * @param  CarbonInterface  $verificationDateTime  the date and time for which the parking validity is checked
+     * @param  ?CarbonInterface  $verificationDateTime  the date and time for which the parking validity is checked. When is null, the current date and time should be used.
      */
     public function checkPlate(
         string $plateNumber,
-        CarbonInterface $verificationDateTime
+        ?CarbonInterface $verificationDateTime
     ): ParkingValidationResponseData;
 }
