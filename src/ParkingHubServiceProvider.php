@@ -8,12 +8,23 @@ use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 
 class ParkingHubServiceProvider extends LaravelServiceProvider
 {
+    public function register(): void
+    {
+
+        $this->mergeConfigFrom(__DIR__.'/../config/parking-hub.php', 'parking-hub');
+
+    }
+
     public function boot(): void
     {
         $this->loadTranslations();
-    }
 
-    public function register() {}
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../config/parking-hub.php' => config_path('parking-hub.php'),
+            ], 'parking-hub-config');
+        }
+    }
 
     /**
      * Load translations for the package.
