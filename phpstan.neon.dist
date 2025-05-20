@@ -1,0 +1,21 @@
+includes:
+    - ./vendor/larastan/larastan/extension.neon
+    - vendor/phpstan/phpstan-mockery/extension.neon
+
+parameters:
+
+    paths:
+        - src/
+        - tests/
+
+    level: max
+
+    reportUnmatchedIgnoredErrors: false
+
+    ignoreErrors:
+        - '#Trait Oltrematica\\ParkingHub\\Trait\\HasRoles is used zero times and is not analysed.#'
+
+    excludePaths:
+        - ./tests/ArchTest.php
+        - ./tests/TestCase.php
+        - ./tests/UnitTestCase.php
