@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-parking-hub` will be documented in this file.
 
+## v0.1.4 - 2025-06-05
+
+### What's Changed
+
+* feat: add findClosestParkingRange method to ParkingValidationResponse… by @mirchaemanuel in https://github.com/Oltrematica/laravel-parking-hub/pull/3
+
+**Full Changelog**: https://github.com/Oltrematica/laravel-parking-hub/compare/v0.1.3...v0.1.4
+
 ## v0.1.3 - 2025-05-20
 
 ### What's Changed
