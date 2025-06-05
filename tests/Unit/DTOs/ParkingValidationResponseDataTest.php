@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use InvalidArgumentException;
 use Oltrematica\ParkingHub\DTOs\ParkingValidationResponseData;
+use Oltrematica\ParkingHub\DTOs\PurchasedParkingData;
 use Oltrematica\ParkingHub\Enums\ProviderInteractionStatus;
 
 describe('ParkingValidationResponseData - buildFailure', function (): void {
@@ -59,5 +60,211 @@ describe('ParkingValidationResponseData - buildFailure', function (): void {
 
         expect($dto->verificationTimestamp)->toBeInstanceOf(CarbonInterface::class)
             ->and($dto->verificationTimestamp->equalTo($requestTimestamp))->toBeTrue();
+    });
+});
+
+describe('ParkingValidationResponseData - findClosestParkingRange', function (): void {
+    it('returns null values when no purchased parkings exist', function (): void {
+        $dto = new ParkingValidationResponseData(
+            responseStatus: ProviderInteractionStatus::SUCCESS_OK,
+            plate: 'AA123BB',
+            requestTimestamp: Carbon::now(),
+            verificationTimestamp: Carbon::now(),
+            isValid: false,
+            parkingEndTime: null,
+            purchasedParkings: null
+        );
+
+        $result = $dto->findClosestParkingRange(Carbon::now());
+
+        expect($result)->toBe([
+            'parking' => null,
+            'duration_minutes' => null,
+            'overflow_minutes' => null,
+            'is_expired' => false,
+        ]);
+    });
+
+    it('returns null values when purchased parkings array is empty', function (): void {
+        $dto = new ParkingValidationResponseData(
+            responseStatus: ProviderInteractionStatus::SUCCESS_OK,
+            plate: 'AA123BB',
+            requestTimestamp: Carbon::now(),
+            verificationTimestamp: Carbon::now(),
+            isValid: false,
+            parkingEndTime: null,
+            purchasedParkings: []
+        );
+
+        $result = $dto->findClosestParkingRange(Carbon::now());
+
+        expect($result)->toBe([
+            'parking' => null,
+            'duration_minutes' => null,
+            'overflow_minutes' => null,
+            'is_expired' => false,
+        ]);
+    });
+
+    it('finds active parking when current time is within parking range', function (): void {
+        $startTime = Carbon::parse('2025-06-05 10:00:00');
+        $endTime = Carbon::parse('2025-06-05 12:00:00');
+        $currentTime = Carbon::parse('2025-06-05 11:00:00');
+
+        $parking = new PurchasedParkingData($startTime, $endTime);
+
+        $dto = new ParkingValidationResponseData(
+            responseStatus: ProviderInteractionStatus::SUCCESS_OK,
+            plate: 'AA123BB',
+            requestTimestamp: Carbon::now(),
+            verificationTimestamp: Carbon::now(),
+            isValid: true,
+            parkingEndTime: $endTime,
+            purchasedParkings: [$parking]
+        );
+
+        $result = $dto->findClosestParkingRange($currentTime);
+
+        expect($result['parking'])->toBe($parking)
+            ->and($result['duration_minutes'])->toBe(120) // 2 hours
+            ->and($result['overflow_minutes'])->toBe(0)
+            ->and($result['is_expired'])->toBeFalse();
+    });
+
+    it('finds expired parking and calculates overflow minutes', function (): void {
+        $startTime = Carbon::parse('2025-06-05 10:00:00');
+        $endTime = Carbon::parse('2025-06-05 12:00:00');
+        $currentTime = Carbon::parse('2025-06-05 12:30:00'); // 30 minutes after end
+
+        $parking = new PurchasedParkingData($startTime, $endTime);
+
+        $dto = new ParkingValidationResponseData(
+            responseStatus: ProviderInteractionStatus::SUCCESS_OK,
+            plate: 'AA123BB',
+            requestTimestamp: Carbon::now(),
+            verificationTimestamp: Carbon::now(),
+            isValid: false,
+            parkingEndTime: $endTime,
+            purchasedParkings: [$parking]
+        );
+
+        $result = $dto->findClosestParkingRange($currentTime);
+
+        expect($result['parking'])->toBe($parking)
+            ->and($result['duration_minutes'])->toBe(120) // 2 hours
+            ->and($result['overflow_minutes'])->toBe(30) // 30 minutes overflow
+            ->and($result['is_expired'])->toBeTrue();
+    });
+
+    it('excludes future parkings and returns null when no valid parkings exist', function (): void {
+        $futureStartTime = Carbon::parse('2025-06-05 14:00:00');
+        $futureEndTime = Carbon::parse('2025-06-05 16:00:00');
+        $currentTime = Carbon::parse('2025-06-05 10:00:00'); // before parking starts
+
+        $parking = new PurchasedParkingData($futureStartTime, $futureEndTime);
+
+        $dto = new ParkingValidationResponseData(
+            responseStatus: ProviderInteractionStatus::SUCCESS_OK,
+            plate: 'AA123BB',
+            requestTimestamp: Carbon::now(),
+            verificationTimestamp: Carbon::now(),
+            isValid: false,
+            parkingEndTime: null,
+            purchasedParkings: [$parking]
+        );
+
+        $result = $dto->findClosestParkingRange($currentTime);
+
+        expect($result)->toBe([
+            'parking' => null,
+            'duration_minutes' => null,
+            'overflow_minutes' => null,
+            'is_expired' => false,
+        ]);
+    });
+
+    it('finds closest parking among multiple parkings', function (): void {
+        $parking1Start = Carbon::parse('2025-06-05 08:00:00');
+        $parking1End = Carbon::parse('2025-06-05 10:00:00');
+
+        $parking2Start = Carbon::parse('2025-06-05 11:00:00');
+        $parking2End = Carbon::parse('2025-06-05 13:00:00');
+
+        $parking3Start = Carbon::parse('2025-06-05 14:00:00');
+        $parking3End = Carbon::parse('2025-06-05 16:00:00');
+
+        $currentTime = Carbon::parse('2025-06-05 13:30:00'); // 30 minutes after parking2 ends
+
+        $parking1 = new PurchasedParkingData($parking1Start, $parking1End);
+        $parking2 = new PurchasedParkingData($parking2Start, $parking2End);
+        $parking3 = new PurchasedParkingData($parking3Start, $parking3End);
+
+        $dto = new ParkingValidationResponseData(
+            responseStatus: ProviderInteractionStatus::SUCCESS_OK,
+            plate: 'AA123BB',
+            requestTimestamp: Carbon::now(),
+            verificationTimestamp: Carbon::now(),
+            isValid: false,
+            parkingEndTime: null,
+            purchasedParkings: [$parking1, $parking2, $parking3]
+        );
+
+        $result = $dto->findClosestParkingRange($currentTime);
+
+        // Should find parking2 as it's the closest (30 minutes ago)
+        expect($result['parking'])->toBe($parking2)
+            ->and($result['duration_minutes'])->toBe(120) // 2 hours
+            ->and($result['overflow_minutes'])->toBe(30) // 30 minutes overflow
+            ->and($result['is_expired'])->toBeTrue();
+    });
+
+    it('handles edge case with parking ending exactly at current time', function (): void {
+        $startTime = Carbon::parse('2025-06-05 10:00:00');
+        $endTime = Carbon::parse('2025-06-05 12:00:00');
+        $currentTime = Carbon::parse('2025-06-05 12:00:00'); // exactly at end time
+
+        $parking = new PurchasedParkingData($startTime, $endTime);
+
+        $dto = new ParkingValidationResponseData(
+            responseStatus: ProviderInteractionStatus::SUCCESS_OK,
+            plate: 'AA123BB',
+            requestTimestamp: Carbon::now(),
+            verificationTimestamp: Carbon::now(),
+            isValid: true,
+            parkingEndTime: $endTime,
+            purchasedParkings: [$parking]
+        );
+
+        $result = $dto->findClosestParkingRange($currentTime);
+
+        expect($result['parking'])->toBe($parking)
+            ->and($result['duration_minutes'])->toBe(120)
+            ->and($result['overflow_minutes'])->toBe(0) // exactly at end, so no overflow
+            ->and($result['is_expired'])->toBeFalse();
+    });
+
+    it('handles parking starting exactly at current time', function (): void {
+        $startTime = Carbon::parse('2025-06-05 10:00:00');
+        $endTime = Carbon::parse('2025-06-05 12:00:00');
+        $currentTime = Carbon::parse('2025-06-05 10:00:00'); // exactly at start time
+
+        $parking = new PurchasedParkingData($startTime, $endTime);
+
+        $dto = new ParkingValidationResponseData(
+            responseStatus: ProviderInteractionStatus::SUCCESS_OK,
+            plate: 'AA123BB',
+            requestTimestamp: Carbon::now(),
+            verificationTimestamp: Carbon::now(),
+            isValid: true,
+            parkingEndTime: $endTime,
+            purchasedParkings: [$parking]
+        );
+
+        $result = $dto->findClosestParkingRange($currentTime);
+
+        expect($result['parking'])->toBe($parking)
+            ->and($result['duration_minutes'])->toBe(120)
+            ->and($result['overflow_minutes'])->toBe(0)
+            ->and($result['is_expired'])->toBeFalse();
     });
 });
